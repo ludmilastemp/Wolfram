@@ -30,6 +30,9 @@ Eval (NodeBinTree* node, Stack_Variable* stk)
             return left / right;
         case '^':
             return pow (left, right);
+        case 'l':
+            if (node->left == nullptr) return log (right);
+            return log (right) / log (left);
         default:
             printf ("INCORRECT OPCODE!!!\n");
     }
@@ -56,6 +59,183 @@ GetVariable (NodeBinTree* node, Stack_Variable* stk)
     StackPush (stk, var);
 
     return 0;
+}
+
+NodeBinTree*
+Differentiate (NodeBinTree* node)
+{
+    if (node == nullptr) return nullptr;
+
+    if (node->data->variable != nullptr)
+    {
+        return NodeBinTreeCtor (NodeBinTreeDataCtor (1, 0, nullptr),
+            nullptr, nullptr, nullptr);
+    }
+    if (node->data->opCode   == 0)
+    {
+        return NodeBinTreeCtor (NodeBinTreeDataCtor (0, 0, nullptr),
+            nullptr, nullptr, nullptr);
+    }
+
+    switch (node->data->opCode)
+    {
+        case '+':
+            return
+            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '+', nullptr),
+                Differentiate (node->left),
+                Differentiate (node->right),
+                nullptr);
+        case '-':
+            return
+            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '-', nullptr),
+                Differentiate (node->left),
+                Differentiate (node->right),
+                nullptr);
+        case '*':
+            return
+            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '+', nullptr),
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                    Differentiate (node->left),
+                    BinTreeCopy (node->right),
+                    nullptr),
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                    BinTreeCopy (node->left),
+                    Differentiate (node->right),
+                    nullptr),
+                nullptr);
+        case '/':
+            return
+            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '-', nullptr),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        Differentiate (node->left),
+                        BinTreeCopy (node->right),
+                        nullptr),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        BinTreeCopy (node->left),
+                        Differentiate (node->right),
+                        nullptr),
+                    nullptr),
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr),
+                    BinTreeCopy (node->right),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (2, 0, nullptr),
+                        nullptr, nullptr, nullptr),
+                    nullptr),
+                nullptr);
+        case '^':
+            if (node->left ->data->variable == nullptr &&
+                node->left ->data->opCode   == 0 &&
+                node->right->data->variable == nullptr &&
+                node->right->data->opCode   == 0)
+            {   // a ^ b
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, 0, nullptr),
+                    nullptr, nullptr, nullptr);;
+            }
+            if (node->right->data->variable == nullptr &&
+                node->right->data->opCode   == 0)
+            {   // f(x) ^ a
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value, 0, nullptr),
+                            nullptr, nullptr, nullptr),
+                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr),
+                            BinTreeCopy (node->left),
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value - 1, 0, nullptr),
+                                nullptr, nullptr, nullptr)),
+                        nullptr),
+                    Differentiate (node->left),
+                    nullptr);
+            }
+            if (node->left->data->variable == nullptr &&
+                node->left->data->opCode   == 0)
+            {   // a ^ f(x)
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        BinTreeCopy (node),
+                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
+                            nullptr,
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (node->left->data->value, 0, nullptr),
+                                nullptr, nullptr, nullptr),
+                            nullptr),
+                        nullptr),
+                    Differentiate (node->right),
+                    nullptr);
+            }
+            // f(x) ^ g(x)
+        case 'l':
+            if (node->left == nullptr)
+            {   // ln f(x)
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
+                    Differentiate (node->right),
+                    BinTreeCopy (node->right),
+                    nullptr);
+            }
+            if (node->left ->data->variable == nullptr &&
+                node->left ->data->opCode   == 0 &&
+                node->right->data->variable == nullptr &&
+                node->right->data->opCode   == 0)
+            {   // log_a  b
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, 0, nullptr),
+                    nullptr, nullptr, nullptr);
+            }
+            if (node->left->data->variable == nullptr &&
+                node->left->data->opCode   == 0)
+            {   // log_a  f(x)
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
+                    Differentiate (node->right),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        BinTreeCopy (node->right),
+                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
+                            nullptr,
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (node->left->data->value, 0, nullptr),
+                                nullptr, nullptr, nullptr),
+                            nullptr),
+                        nullptr),
+                    nullptr);
+            }
+            if (node->right->data->variable == nullptr &&
+                node->right->data->opCode   == 0)
+            {   // log_f(x)  a
+                return
+                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (-1, 0, nullptr),
+                                nullptr, nullptr, nullptr),
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
+                                nullptr,
+                                NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value, 0, nullptr),
+                                    nullptr, nullptr, nullptr),
+                                nullptr),
+                            nullptr),
+                        Differentiate (node->right),
+                        nullptr),
+                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
+                        BinTreeCopy (node->left),
+                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr),
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
+                                nullptr,
+                                NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value, 0, nullptr),
+                                    nullptr, nullptr, nullptr),
+                                nullptr),
+                            NodeBinTreeCtor (NodeBinTreeDataCtor (2, 0, nullptr),
+                                nullptr, nullptr, nullptr),
+                            nullptr),
+                        nullptr),
+                    nullptr);
+            }
+            // log_f(x)  g(x)
+
+    }
+
+    return nullptr;
+
 }
 
 static Variable*

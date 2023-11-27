@@ -6,24 +6,24 @@ node  [ shape = record, style = filled, fillcolor = "#E0FFFF", color = "#A0FFFF"
 edge  [ arrowhead = none ]
 
 
-f0 [ label = "/",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f0 [ label = "+",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f0->f1 
 
-f1 [ label = "-",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f1 [ label = "^",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f1->f2 
 
-f2 [ label = 2000,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
-f1->f3 
+f2 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f1->f4 
 
-f3 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
-f0->f5 
+f4 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f0->f7 
 
-f5 [ label = "+",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
-f5->f6 
+f7 [ label = "^",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f7->f8 
 
-f6 [ label = "kar",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
-f5->f7 
+f8 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f7->f10 
 
-f7 [ label = "kar",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f10 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
 
 }

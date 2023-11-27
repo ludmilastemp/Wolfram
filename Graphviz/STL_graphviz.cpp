@@ -41,15 +41,16 @@ static void PrintSubtree (FILE* fp, const NodeBinTree* node, int* num)
         pr (" [ label = \"" BIN_TREE_DATA_OPCODE_PRINT_SPECIFIER "\", \
         fillcolor = \"#E0FFFF\", color = \"#A0FFFF\" ]\n", node->data->opCode);
 
+    (*num)++;
     if (node->left != nullptr)
     {
-        (*num)++;
         fprintf (fp, "f%d->f%d \n", curNum, *num);
         PrintSubtree (fp, node->left, num);
     }
 
     if (node->right != nullptr)
     {
+//        if (node->left == nullptr) (*num)++;
         fprintf (fp, "f%d->f%d \n", curNum, *num);
         PrintSubtree (fp, node->right, num);
     }

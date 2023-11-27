@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "../Akinator/Bintree/STL_bintree_node_struct.h"
+#include "../Akinator/Bintree/STL_bintree_struct.h"
 #include "Stack_config/STACK_FILE_TYPE_VARIABLE.h"
 #include "../Stack/generic.h"
 
@@ -16,5 +17,7 @@ Eval (NodeBinTree* node, Stack_Variable* stk);
 int
 GetVariable (NodeBinTree* node, Stack_Variable* stk);
 
+NodeBinTree*
+Differentiate (NodeBinTree* node);
 
 #endif /* STL_wolfram_ */
