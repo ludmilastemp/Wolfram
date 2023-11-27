@@ -4,9 +4,9 @@
 
 static void PrintSubtree (FILE* fp, const NodeBinTree* node, int* num);
 
-int STL_GraphvizBinTree1 (const NodeBinTree* node)
+int STL_GraphvizBinTree (const NodeBinTree* node)
 {
-    FILE* fp = fopen ("STL_graphviz_png.dot", "w");
+    FILE* fp = fopen ("Graphviz/STL_graphviz_png.dot", "w");
     assert (fp);
 
     pr ("digraph STL\n{\n"
@@ -31,9 +31,12 @@ static void PrintSubtree (FILE* fp, const NodeBinTree* node, int* num)
 
     int curNum = *num;
 
-    if (node->data->opCode == 0)
+    if (node->data->variable != nullptr)
+        pr (" [ label = \"" BIN_TREE_DATA_VARIABLE_PRINT_SPECIFIER "\", \
+        fillcolor = \"#FFE0FF\", color = \"#FFA0FF\" ]\n", node->data->variable);
+    else if (node->data->opCode == 0)
         pr (" [ label = " BIN_TREE_DATA_VALUE_PRINT_SPECIFIER ", \
-        fillcolor = \"#CCFFCC\", color = \"#CCFFCC\" ]\n", node->data->value);
+        fillcolor = \"#E0FFE0\", color = \"#ACFFAC\" ]\n", node->data->value);
     else
         pr (" [ label = \"" BIN_TREE_DATA_OPCODE_PRINT_SPECIFIER "\", \
         fillcolor = \"#E0FFFF\", color = \"#A0FFFF\" ]\n", node->data->opCode);

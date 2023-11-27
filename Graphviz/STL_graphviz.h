@@ -8,9 +8,9 @@
 #include <sys\stat.h>
 #include <assert.h>
 
-#include "../Akinator/BinTree/STL_bintree_node_struct.h"
+#include "../../Akinator/BinTree/STL_bintree_node_struct.h"
 
 int
-STL_GraphvizBinTree1 (const NodeBinTree* node);
+STL_GraphvizBinTree (const NodeBinTree* node);
 
 #endif /* STL_graphviz_ */
