@@ -21,9 +21,15 @@ f0->f7
 f7 [ label = "^",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f7->f8 
 
-f8 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
-f7->f10 
+f8 [ label = "-",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f8->f9 
 
-f10 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f9 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f8->f11 
+
+f11 [ label = 2,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f7->f14 
+
+f14 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
 
 }

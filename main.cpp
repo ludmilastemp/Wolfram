@@ -3,7 +3,7 @@
 #include "Graphviz/STL_graphviz.h"
 #include "Latex/STL_latex.h"
 
-// Пожалуйста, не используйте переменные "l" - log
+/// Пожалуйста, не используйте переменную "l" - log
 
 int main (const int argc, const char** argv)
 {

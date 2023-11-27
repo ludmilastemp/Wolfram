@@ -3,6 +3,9 @@
 static Variable*
 EvalVariable (NodeBinTree* node, Stack_Variable* stk);
 
+static int
+IsConstData (NodeBinTree* node);
+
 double
 Eval (NodeBinTree* node, Stack_Variable* stk)
 {
@@ -61,6 +64,16 @@ GetVariable (NodeBinTree* node, Stack_Variable* stk)
     return 0;
 }
 
+#define d(x) Differentiate (x)
+#define c(x) BinTreeCopy (x)
+#define _CONST(x)  NodeBinTreeCtor (NodeBinTreeDataCtor (x, 0, nullptr), nullptr, nullptr, nullptr)
+#define _ADD(x, y) NodeBinTreeCtor (NodeBinTreeDataCtor (0, '+', nullptr), x, y, nullptr)
+#define _SUB(x, y) NodeBinTreeCtor (NodeBinTreeDataCtor (0, '-', nullptr), x, y, nullptr)
+#define _MUL(x, y) NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr), x, y, nullptr)
+#define _DIV(x, y) NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr), x, y, nullptr)
+#define _POW(x, y) NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr), x, y, nullptr)
+#define _LN(x)     NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr), nullptr, x, nullptr)
+
 NodeBinTree*
 Differentiate (NodeBinTree* node)
 {
@@ -68,175 +81,101 @@ Differentiate (NodeBinTree* node)
 
     if (node->data->variable != nullptr)
     {
-        return NodeBinTreeCtor (NodeBinTreeDataCtor (1, 0, nullptr),
-            nullptr, nullptr, nullptr);
+        return _CONST (1);
     }
     if (node->data->opCode   == 0)
     {
-        return NodeBinTreeCtor (NodeBinTreeDataCtor (0, 0, nullptr),
-            nullptr, nullptr, nullptr);
+        return _CONST (0);
     }
 
     switch (node->data->opCode)
     {
         case '+':
             return
-            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '+', nullptr),
-                Differentiate (node->left),
-                Differentiate (node->right),
-                nullptr);
+            _ADD (d(node->left), d(node->right));
         case '-':
             return
-            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '-', nullptr),
-                Differentiate (node->left),
-                Differentiate (node->right),
-                nullptr);
+            _SUB (d(node->left), d(node->right));
         case '*':
             return
-            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '+', nullptr),
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                    Differentiate (node->left),
-                    BinTreeCopy (node->right),
-                    nullptr),
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                    BinTreeCopy (node->left),
-                    Differentiate (node->right),
-                    nullptr),
-                nullptr);
+            _ADD (_MUL (d(node->left), c(node->right)),
+                  _MUL (c(node->left), d(node->right)));
         case '/':
             return
-            NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '-', nullptr),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        Differentiate (node->left),
-                        BinTreeCopy (node->right),
-                        nullptr),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        BinTreeCopy (node->left),
-                        Differentiate (node->right),
-                        nullptr),
-                    nullptr),
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr),
-                    BinTreeCopy (node->right),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (2, 0, nullptr),
-                        nullptr, nullptr, nullptr),
-                    nullptr),
-                nullptr);
+            _DIV (_SUB (_MUL (d(node->left), c(node->right)),
+                        _MUL (c(node->left), d(node->right))),
+                  _POW (c(node->right), _CONST (2)));
         case '^':
-            if (node->left ->data->variable == nullptr &&
-                node->left ->data->opCode   == 0 &&
-                node->right->data->variable == nullptr &&
-                node->right->data->opCode   == 0)
-            {   // a ^ b
-                return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, 0, nullptr),
-                    nullptr, nullptr, nullptr);;
+                /// a ^ b
+            if (IsConstData (node->left) &&
+                IsConstData (node->right))
+            {
+                return _CONST (0);
             }
-            if (node->right->data->variable == nullptr &&
-                node->right->data->opCode   == 0)
-            {   // f(x) ^ a
+                /// f(x) ^ a
+            if (IsConstData (node->right))
+            {
                 return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value, 0, nullptr),
-                            nullptr, nullptr, nullptr),
-                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr),
-                            BinTreeCopy (node->left),
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value - 1, 0, nullptr),
-                                nullptr, nullptr, nullptr)),
-                        nullptr),
-                    Differentiate (node->left),
-                    nullptr);
+                _MUL (_MUL (_CONST (node->right->data->value),
+                            _POW (c(node->left), _CONST (node->right->data->value - 1))),
+                      d(node->left));
             }
-            if (node->left->data->variable == nullptr &&
-                node->left->data->opCode   == 0)
-            {   // a ^ f(x)
+                /// a ^ f(x)
+            if (IsConstData (node->left))
+            {
                 return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        BinTreeCopy (node),
-                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
-                            nullptr,
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (node->left->data->value, 0, nullptr),
-                                nullptr, nullptr, nullptr),
-                            nullptr),
-                        nullptr),
-                    Differentiate (node->right),
-                    nullptr);
+                _MUL (_MUL (c(node),
+                            _LN (_CONST (node->left->data->value))),
+                      d(node->right));
             }
             // f(x) ^ g(x)
         case 'l':
+                /// ln f(x)
             if (node->left == nullptr)
-            {   // ln f(x)
+            {
                 return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
-                    Differentiate (node->right),
-                    BinTreeCopy (node->right),
-                    nullptr);
+                _DIV (d(node->right), c(node->right));
             }
-            if (node->left ->data->variable == nullptr &&
-                node->left ->data->opCode   == 0 &&
-                node->right->data->variable == nullptr &&
-                node->right->data->opCode   == 0)
-            {   // log_a  b
-                return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, 0, nullptr),
-                    nullptr, nullptr, nullptr);
+                /// log_a  b
+            if (IsConstData (node->left) &&
+                IsConstData (node->right))
+            {
+                return _CONST (0);
             }
-            if (node->left->data->variable == nullptr &&
-                node->left->data->opCode   == 0)
-            {   // log_a  f(x)
+                /// log_a  f(x)
+            if (IsConstData (node->left))
+            {
                 return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
-                    Differentiate (node->right),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        BinTreeCopy (node->right),
-                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
-                            nullptr,
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (node->left->data->value, 0, nullptr),
-                                nullptr, nullptr, nullptr),
-                            nullptr),
-                        nullptr),
-                    nullptr);
+                _DIV (d(node->right),
+                      _MUL (c(node->right),
+                            _LN (_CONST (node->left->data->value))));
             }
-            if (node->right->data->variable == nullptr &&
-                node->right->data->opCode   == 0)
-            {   // log_f(x)  a
+                /// log_f(x)  a
+            if (IsConstData (node->right))
+            {
                 return
-                NodeBinTreeCtor (NodeBinTreeDataCtor (0, '/', nullptr),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (-1, 0, nullptr),
-                                nullptr, nullptr, nullptr),
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
-                                nullptr,
-                                NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value, 0, nullptr),
-                                    nullptr, nullptr, nullptr),
-                                nullptr),
-                            nullptr),
-                        Differentiate (node->right),
-                        nullptr),
-                    NodeBinTreeCtor (NodeBinTreeDataCtor (0, '*', nullptr),
-                        BinTreeCopy (node->left),
-                        NodeBinTreeCtor (NodeBinTreeDataCtor (0, '^', nullptr),
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (0, 'l', nullptr),
-                                nullptr,
-                                NodeBinTreeCtor (NodeBinTreeDataCtor (node->right->data->value, 0, nullptr),
-                                    nullptr, nullptr, nullptr),
-                                nullptr),
-                            NodeBinTreeCtor (NodeBinTreeDataCtor (2, 0, nullptr),
-                                nullptr, nullptr, nullptr),
-                            nullptr),
-                        nullptr),
-                    nullptr);
+                _DIV (_MUL (_MUL (_CONST (-1),
+                                  _LN (_CONST (node->right->data->value))),
+                            d(node->right)),
+                      _MUL (c(node->left),
+                            _POW (_LN (_CONST (node->right->data->value)),
+                                  _CONST (2))));
             }
             // log_f(x)  g(x)
-
     }
 
     return nullptr;
-
 }
+
+#undef d
+#undef c
+#undef _CONST
+#undef _ADD
+#undef _SUB
+#undef _MUL
+#undef _DIV
+#undef _POW
+#undef _LN
 
 static Variable*
 EvalVariable (NodeBinTree* node, Stack_Variable* stk)
@@ -253,3 +192,15 @@ EvalVariable (NodeBinTree* node, Stack_Variable* stk)
 
     return nullptr;
 }
+
+static int
+IsConstData (NodeBinTree* node)
+{
+    if (node == nullptr) return 0;
+
+    if (node->data->variable == nullptr &&
+        node->data->opCode   == 0)         return 1;
+
+    return 0;
+}
+
