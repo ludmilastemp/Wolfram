@@ -1,147 +1,437 @@
 #include "STL_latex.h"
 
-#define pr(...) fprintf (fp, __VA_ARGS__)
+//#define pr(...) fprintf (fp, __VA_ARGS__)
+#define pr(...) sprintf (str + pos, __VA_ARGS__);\
+                pos = strlen (str)
+
+static char str[1000]   = { 0 };   // как объединить эти 2???
+static int        pos   = 0;       // - постоянный strlen
+static int      nIndex  = 0;       // stack->size
+static char* index[100] = { 0 };   // stack
+
+static double
+PrintSubtree (FILE* fp, NodeBinTree* node, Stack_Variable* stk);
+
+static double
+PrintSubtreeWithBrackets (FILE* fp, NodeBinTree* node, Stack_Variable* stk);
 
 static int
-PrintSubtree (FILE* fp, const NodeBinTree* node);
+IsOperation (FILE* fp, const NodeBinTree* node, Stack_Variable* stk);
 
-static int
-PrintSubtreeWithBrackets (FILE* fp, const NodeBinTree* node);
+static double
+RecCountStrlenLatex (NodeBinTree* node, Stack_Variable* stk);
 
-static int
-IsOperation (FILE* fp, const NodeBinTree* node);
+static double
+CountStrlenLatex (int sign, double left, double right);
 
-int STL_Latex (const NodeBinTree* node)
+static int isOpen = 0;
+
+void STL_Latex (BinTree* tree, const char* const name)
 {
-    FILE* fp = fopen ("Latex/STL_latex_txt.dot", "w");
-    assert (fp);
+    FILE* fp = nullptr;
 
-    pr ("\\documentclass{article}\
-         \n\\usepackage{graphicx}\
-         \n\\usepackage{amssymb}\
-         \n\\usepackage[english]{babel}\
-         \n\\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}\
-         \n\\usepackage{amsmath}\
-         \n\\usepackage{graphicx}\
-         \n\\usepackage[colorlinks=true, allcolors=blue]{hyperref}");
+    if (!isOpen){
+        fp = fopen ("Latex/STL_latex_txt.dot", "w");
+        assert (fp);
 
-    pr ("\\begin{document}\
-         \n\\begin{equation*}\n");
+        fprintf (fp, "\
+            \n\\Large\
+            \n\\title{Добро пожаловать}\
+            \n\\author{Стемпоржецкая Л.В. \\\\ Б05-331}\
+            \n\\maketitle");
 
-    PrintSubtree (fp, node);
+        isOpen = 1;
+    }
 
-    pr ("\n\\end{equation*}\
-         \n\\end{document}\n");
+    else
+    {
+        fp = fopen ("Latex/STL_latex_txt.dot", "a");
+        assert (fp);
+    }
+
+    pos  = 0;
+    nIndex = 0;
+
+    fprintf (fp, "\n\n%s\n", name);
+
+    if (tree == nullptr)
+    {
+        fclose (fp);
+        return;
+    }
+
+    fprintf (fp, "\\begin{equation*}\n");
+
+//    printf ("\tlatex len rec = %lg\n", RecCountStrlenLatex (tree->root, tree->variable));
+//    printf ("\tlatex len sub = %lg\n", PrintSubtree (fp, tree->root, tree->variable));
+
+    PrintSubtree (fp, tree->root, tree->variable);
+
+    /// обработка выражений вида y = A, где A = ...
+    if (str [1] == nIndex - 1 + 'A' && pos == 3)
+    {
+//        str = index[--nIndex];
+        strcpy (str, index[--nIndex]);
+        pos = strlen (str);
+    }
+
+
+    if (nIndex) pr (", где ");
+    for (int i = 0; i < nIndex; i++)
+    {
+        pr ("\\end{equation*}\n");
+        pr ("\\begin{equation*}\n");
+
+        pr ("\t%c = %s\n", 'A' + i, index[i]);
+
+        free (index[i]);
+    }
+
+    fprintf (fp, "%s", str);
+
+    fprintf (fp, "\n\\end{equation*}\n");
+
+
+//    printf ("\n\n%s\n\n", str);
+//    printf ("\n\n%d\n\n", pos);
 
     fclose (fp);
-
-    return 0; //void
 }
 
-static int
-PrintSubtree (FILE* fp, const NodeBinTree* node)
+static double
+PrintSubtree (FILE* fp, NodeBinTree* node, Stack_Variable* stk)
 {
     if (fp == nullptr || node == nullptr) return 0;
 
-    if (!IsOperation (fp, node)) return 0;
+//    printf ("%d %s \n", pos, str);
+
+    int lenData = IsOperation (fp, node, stk);
+    if (lenData != 0) return lenData;
+
+    int oldPos = pos;
+
+    int left  = 0;
+    int right = 0;
 
     switch (node->data->opCode)
     {
         case '+':
-            PrintSubtree (fp, node->left);
-            pr ("+", node->data->opCode);
-            PrintSubtree (fp, node->right);
+
+            left = PrintSubtree (fp, node->left, stk);
+
+            pr ("+");
+
+            right = PrintSubtree (fp, node->right, stk);
+
             break;
+
         case '-':
-            PrintSubtree (fp, node->left);
-            pr ("-", node->data->opCode);
-            PrintSubtreeWithBrackets (fp, node->right);
+
+            left = PrintSubtree (fp, node->left, stk);
+
+            pr ("-");
+
+            right = PrintSubtreeWithBrackets (fp, node->right, stk);
+
             break;
+
         case '*':
-            PrintSubtreeWithBrackets (fp, node->left);
-            pr ("*", node->data->opCode);
-            PrintSubtreeWithBrackets (fp, node->right);
+
+            left = PrintSubtreeWithBrackets (fp, node->left, stk);
+
+            /// const * variable without '*' f.e. 7x + 5b
+            if (node->left->data->opCode    == NodeBinTreeData::OPCODE_POISON &&
+                node->left->data->variable  == NodeBinTreeData::VARIABLE_POISON &&
+                node->right->data->variable != NodeBinTreeData::VARIABLE_POISON) ;
+            else pr ("\\cdot ");
+
+            right = PrintSubtreeWithBrackets (fp, node->right, stk);
+
             break;
+
         case '/':
-            pr ("\\frac{", node->data->opCode);
-            PrintSubtree (fp, node->left);
-            pr ("}{", node->data->opCode);
-            PrintSubtree (fp, node->right);
-            pr ("}", node->data->opCode);
+
+            pr ("\\frac{");
+
+            left = PrintSubtree (fp, node->left, stk);
+
+            pr ("}{");
+
+            right = PrintSubtree (fp, node->right, stk);
+
+            pr ("}");
+
             break;
+
         case '^':
-            pr ("{", node->data->opCode);
 
-            if (node->left->data->opCode != 0) pr ("(");
-            PrintSubtree (fp, node->left);
-            if (node->left->data->opCode != 0) pr (")");
+            pr ("{");
 
-            pr ("}^{", node->data->opCode);
-            PrintSubtree (fp, node->right);
-            pr ("}", node->data->opCode);
+            if (node->left->data->opCode != 0) { pr ("("); }
+
+            left = PrintSubtree (fp, node->left, stk);
+
+            if (node->left->data->opCode != 0) { pr (")"); }
+
+            pr ("}^{");
+
+            right = PrintSubtree (fp, node->right, stk);
+
+            pr ("}");
+
             break;
-        case 'l':
+
+        case SIN + OPCODE:
+
+            pr ("sin(");
+
+            right = PrintSubtree (fp, node->right, stk);
+
+            pr (")");
+
+            break;
+
+        case COS + OPCODE:
+
+            pr ("cos(");
+
+            right = PrintSubtree (fp, node->right, stk);
+
+            pr (")");
+
+            break;
+
+        case LN + OPCODE:
+
             if (node->left != 0)
             {
                 pr ("\\log_", node->data->opCode);
+
                 if (node->left->data->opCode != 0) pr ("{");
-                PrintSubtree (fp, node->left);
+
+                left = PrintSubtree (fp, node->left, stk);
+
                 if (node->left->data->opCode != 0) pr ("}");
             }
+
             else pr ("\\ln", node->data->opCode);
 
             if (node->right->data->opCode != 0) pr ("(");
-            PrintSubtree (fp, node->right);
+
+            right = PrintSubtree (fp, node->right, stk);
+
             if (node->right->data->opCode != 0) pr (")");
 
             break;
     }
 
-    return 0;
+    double len = CountStrlenLatex (node->data->opCode, left, right);
+
+    /// проверка, нужно ли делать замену
+    if (len > LATEX_MAX_LEN)
+    {
+        index[nIndex] = (char*) calloc (pos - oldPos + 1, sizeof (char));
+        if (index[nIndex] == nullptr)
+        {
+            printf ("ERROR_NO_MEMORY\n");
+            return 0;
+        }
+
+        strcpy (index[nIndex], str + oldPos);
+
+        pos = oldPos;
+        pr (" %c ", 'A' + nIndex);
+
+        nIndex++;
+        return 1;
+    }
+
+    return len;
 }
 
-static int
-PrintSubtreeWithBrackets (FILE* fp, const NodeBinTree* node)
+static double
+PrintSubtreeWithBrackets (FILE* fp, NodeBinTree* node, Stack_Variable* stk)
 {
     if (fp == nullptr || node == nullptr) return 0;
+
+    int len = 0;
 
     switch (node->data->opCode)
     {
         case 0:
-            IsOperation (fp, node);
+
+            len = IsOperation (fp, node, stk);
+
             break;
+
         case '+':
         case '-':
+
             pr ("(");
-            PrintSubtree (fp, node);
+
+            len = PrintSubtree (fp, node, stk);
+            len += 2;    /// две круглые скобки
+
             pr (")");
+
             break;
+
         case '*':
         case '/':
         case '^':
-        case 'l':
-            PrintSubtree (fp, node);
+        case SIN + OPCODE:
+        case COS + OPCODE:
+        case LN  + OPCODE:
+
+            len = PrintSubtree (fp, node, stk);
+
             break;
     }
+
+    return len;
 }
 
 static int
-IsOperation (FILE* fp, const NodeBinTree* node)
+IsOperation (FILE* fp, const NodeBinTree* node, Stack_Variable* stk)
 {
-    if (fp == nullptr || node == nullptr) return 0;
+/* функция
+ * если fp == nullptr
+ *      0 - узел не является оператором
+ *      1 - узел является оператором
+ * если fp != nullptr
+ *      0 - узел является оператором
+ *      иначе длина данных узла в строке
+ */
 
-    if (node->data->variable != nullptr)
+    if (node == nullptr) return 0;
+
+    if (node->data->variable != NodeBinTreeData::VARIABLE_POISON)
     {
-        pr (" %s ", node->data->variable);
+        if (fp != nullptr && node != nullptr)
+        {
+            pr (" %s ", stk->data[node->data->variable].name);
+            return strlen (stk->data[node->data->variable].name);
+        }
+
         return 0;
     }
-    if (node->data->opCode == 0)
+
+    if (node->data->opCode == NodeBinTreeData::OPCODE_POISON)
     {
-        pr (" %lg ", node->data->value);
+        if (fp != nullptr && node != nullptr)
+        {
+            pr (" %lg ", node->data->value);
+
+            char len_value[100] = { 0 };
+            sprintf (len_value, "%lg", node->data->value);
+            return strlen (len_value);
+        }
+
         return 0;
     }
+
+    if (fp != nullptr) return 0;
 
     return 1;
+}
+
+static double
+CountStrlenLatex (int sign, double left, double right)
+{
+//    printf ("sign  = %d\n",  sign);
+//    printf ("left  = %lg\n", left);
+//    printf ("right = %lg\n\n\n", right);
+
+    switch (sign)
+    {
+        case '+':
+        case '-':
+        case '*':
+
+            return left + right + 1;
+
+        case '/':
+
+            if (left < right) return right;
+            return left;
+
+        case '^':
+
+            return left + right * 0.71;
+
+        case SIN + OPCODE:
+        case COS + OPCODE:
+
+            return 3 + right;
+
+        case LN + OPCODE:
+
+            return 2 + left * 0.5 + right;
+
+        default:
+            printf ("INCORRECT OPCODE!!!\n");
+    }
+
+    return 0;
+}
+
+static double
+RecCountStrlenLatex (NodeBinTree* node, Stack_Variable* stk)
+{
+    if (node == nullptr) return 0;
+    if (stk  == nullptr) return 0;
+
+    double left  = RecCountStrlenLatex (node->left,  stk);
+    double right = RecCountStrlenLatex (node->right, stk);
+
+    if (!IsOperation (nullptr, node, nullptr))
+    {
+        if (node->data->variable != NodeBinTreeData::VARIABLE_POISON)
+        {
+//            printf ("name len = %d\n", strlen (stk->data[node->data->variable].name));
+            return strlen (stk->data[node->data->variable].name);
+        }
+        else
+        {
+            char len_value[100] = { 0 };
+            sprintf (len_value, "%lg", node->data->value);
+
+//            printf ("value len = %d\n", strlen (len_value));
+            return strlen (len_value);
+        }
+    }
+
+    switch (node->data->opCode)
+    {
+        case '+':
+        case '-':
+        case '*':
+
+            return left + right + 1;
+
+        case '/':
+
+            if (left < right) return right;
+            return left;
+
+        case '^':
+
+            return left + right * 0.7;
+
+        case SIN + OPCODE:
+        case COS + OPCODE:
+
+            return 3 + right;
+
+        case LN + OPCODE:
+
+            return 2 + left * 0.5 + right;
+
+        default:
+            printf ("INCORRECT OPCODE!!!\n");
+    }
+
+    return 0;
 }
 
 #undef pr

@@ -8,16 +8,20 @@
 
 #include "../Akinator/Bintree/STL_bintree_node_struct.h"
 #include "../Akinator/Bintree/STL_bintree_struct.h"
-#include "Stack_config/STACK_FILE_TYPE_VARIABLE.h"
-#include "../Stack/generic.h"
 
 double
 Eval (NodeBinTree* node, Stack_Variable* stk);
 
 int
-GetVariable (NodeBinTree* node, Stack_Variable* stk);
+GetVariable (BinTree* binTree);
+
+BinTree*
+Differentiate (BinTree* binTree);
 
 NodeBinTree*
-Differentiate (NodeBinTree* node);
+PartialDerivative (NodeBinTree* node, int variable);
+
+int
+IsConstData (NodeBinTree* node);
 
 #endif /* STL_wolfram_ */

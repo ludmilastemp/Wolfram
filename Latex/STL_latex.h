@@ -9,8 +9,11 @@
 #include <assert.h>
 
 #include "../../Akinator/BinTree/STL_bintree_node_struct.h"
+#include "../../Akinator/Bintree/STL_bintree_struct.h"
 
-int
-STL_Latex (const NodeBinTree* node);
+const int LATEX_MAX_LEN = 20;
+
+void
+STL_Latex (BinTree* binTree, const char* const str);
 
 #endif /* STL_latex_ */

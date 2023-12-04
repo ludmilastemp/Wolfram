@@ -6,30 +6,273 @@ node  [ shape = record, style = filled, fillcolor = "#E0FFFF", color = "#A0FFFF"
 edge  [ arrowhead = none ]
 
 
-f0 [ label = "+",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f0 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f0->f1 
 
-f1 [ label = "^",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f1 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f1->f2 
 
-f2 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
-f1->f4 
+f2 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f2->f3 
 
-f4 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
-f0->f7 
+f3 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f3->f4 
 
-f7 [ label = "^",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f4 [ label = 0,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f3->f6 
+
+f6 [ label = "^",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f6->f7 
+
+f7 [ label = " sin ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f7->f8 
 
-f8 [ label = "-",         fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f8 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
 f8->f9 
 
-f9 [ label = "meow",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
-f8->f11 
+f9 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f9->f10 
 
-f11 [ label = 2,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
-f7->f14 
+f10 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f9->f12 
 
-f14 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f12 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f8->f15 
+
+f15 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f6->f19 
+
+f19 [ label = 4,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f2->f23 
+
+f23 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f23->f24 
+
+f24 [ label = 5,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f23->f26 
+
+f26 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f26->f27 
+
+f27 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f27->f28 
+
+f28 [ label = 4,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f27->f30 
+
+f30 [ label = "^",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f30->f31 
+
+f31 [ label = " sin ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f31->f32 
+
+f32 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f32->f33 
+
+f33 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f33->f34 
+
+f34 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f33->f36 
+
+f36 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f32->f39 
+
+f39 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f30->f43 
+
+f43 [ label = 3,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f26->f47 
+
+f47 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f47->f48 
+
+f48 [ label = " cos ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f48->f49 
+
+f49 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f49->f50 
+
+f50 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f50->f51 
+
+f51 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f50->f53 
+
+f53 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f49->f56 
+
+f56 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f47->f60 
+
+f60 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f60->f61 
+
+f61 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f61->f62 
+
+f62 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f62->f63 
+
+f63 [ label = 0,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f62->f65 
+
+f65 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f61->f68 
+
+f68 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f68->f69 
+
+f69 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f68->f71 
+
+f71 [ label = 1,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f60->f75 
+
+f75 [ label = 0,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f1->f82 
+
+f82 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f82->f83 
+
+f83 [ label = " cos ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f83->f84 
+
+f84 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f84->f85 
+
+f85 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f85->f86 
+
+f86 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f85->f88 
+
+f88 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f84->f91 
+
+f91 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f82->f95 
+
+f95 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f0->f99 
+
+f99 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f99->f100 
+
+f100 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f100->f101 
+
+f101 [ label = 5,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f100->f103 
+
+f103 [ label = "^",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f103->f104 
+
+f104 [ label = " sin ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f104->f105 
+
+f105 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f105->f106 
+
+f106 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f106->f107 
+
+f107 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f106->f109 
+
+f109 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f105->f112 
+
+f112 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f103->f116 
+
+f116 [ label = 4,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f99->f120 
+
+f120 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f120->f121 
+
+f121 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f121->f122 
+
+f122 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f122->f123 
+
+f123 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f123->f124 
+
+f124 [ label = -1,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f123->f126 
+
+f126 [ label = " sin ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f126->f127 
+
+f127 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f127->f128 
+
+f128 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f128->f129 
+
+f129 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f128->f131 
+
+f131 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f127->f134 
+
+f134 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f122->f139 
+
+f139 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f139->f140 
+
+f140 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f140->f141 
+
+f141 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f141->f142 
+
+f142 [ label = 0,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f141->f144 
+
+f144 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f140->f147 
+
+f147 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f147->f148 
+
+f148 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f147->f150 
+
+f150 [ label = 1,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f139->f154 
+
+f154 [ label = 0,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f121->f158 
+
+f158 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f120->f161 
+
+f161 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f161->f162 
+
+f162 [ label = " cos ",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f162->f163 
+
+f163 [ label = "+",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f163->f164 
+
+f164 [ label = "*",                 fillcolor = "#E0FFFF", color = "#A0FFFF" ]
+f164->f165 
+
+f165 [ label = 7,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f164->f167 
+
+f167 [ label = "x",         fillcolor = "#FFE0FF", color = "#FFA0FF" ]
+f163->f170 
+
+f170 [ label = 9,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
+f161->f174 
+
+f174 [ label = 0,         fillcolor = "#E0FFE0", color = "#ACFFAC" ]
 
 }
